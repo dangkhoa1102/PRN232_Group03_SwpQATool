@@ -16,4 +16,9 @@ public class UserRepository : IUserRepository
     {
         return _context.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
     }
+
+    public User? GetById(Guid id)
+    {
+        return _context.Users.FirstOrDefault(u => u.UserId == id);
+    }
 }

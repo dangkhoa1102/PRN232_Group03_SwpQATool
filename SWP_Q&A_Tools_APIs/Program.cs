@@ -99,6 +99,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<swp_qa_toolsContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITopicRepository, TopicRepository>();
+builder.Services.AddScoped<ITopicService, TopicService>();
 
 var app = builder.Build();
 
