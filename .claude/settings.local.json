@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"D:\\\\PRN232\\\\PRN232_Group03_SwpQATool\\\\SWP_Q&A_Tools_APIs\" -type f -name \"*.cs\")",
+      "Bash(dotnet build:*)"
+    ]
+  }
+}
