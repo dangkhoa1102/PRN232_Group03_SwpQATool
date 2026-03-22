@@ -43,7 +43,7 @@ public class TopicService : ITopicService
             TopicName = request.TopicName.Trim(),
             Description = request.Description?.Trim(),
             ReviewerId = request.ReviewerId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"))
         };
 
         var created = await _topicRepository.CreateAsync(topic);
