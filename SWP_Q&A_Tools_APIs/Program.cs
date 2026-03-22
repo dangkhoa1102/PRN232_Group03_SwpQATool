@@ -109,6 +109,8 @@ builder.Services.AddScoped<ITopicService, TopicService>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IHistoryRepository, HistoryRepository>();
+builder.Services.AddScoped<IHistoryService, HistoryService>();
 
 var app = builder.Build();
 
