@@ -32,6 +32,21 @@ public class GroupRepository : IGroupRepository
             .FirstOrDefaultAsync(g => g.GroupId == id);
     }
 
+    public async Task<IEnumerable<Group>> GetBySupervisorIdAsync(Guid supervisorId)
+    {
+        return await _context.Groups
+            .Include(g => g.Topic)
+            .Include(g => g.Students)
+            .Where(g => g.SupervisorId == supervisorId)
+            .OrderBy(g => g.GroupName)
+            .ToListAsync();
+    }
+
+    public async Task<bool> ExistsByIdAndSupervisorIdAsync(Guid groupId, Guid supervisorId)
+    {
+        return await _context.Groups.AnyAsync(g => g.GroupId == groupId && g.SupervisorId == supervisorId);
+    }
+
     public async Task<bool> ExistsByNameInTopicAsync(string name, Guid topicId, Guid? excludeId = null)
     {
         return await _context.Groups
