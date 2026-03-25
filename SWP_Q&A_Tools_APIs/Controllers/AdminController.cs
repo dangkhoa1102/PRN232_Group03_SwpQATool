@@ -1,5 +1,5 @@
 using BusinessLogicLayer.DTOs.History;
-using BusinessLogicLayer.Services.Interfaces;
+using BusinessLogicLayer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

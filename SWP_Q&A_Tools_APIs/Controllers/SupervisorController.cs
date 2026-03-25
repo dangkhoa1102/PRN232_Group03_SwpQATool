@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using BusinessLogicLayer.DTOs.Group;
 using BusinessLogicLayer.DTOs.Question;
-using BusinessLogicLayer.Services.Interfaces;
+using BusinessLogicLayer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

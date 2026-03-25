@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace SWP_QA_Tools_APIs.Controllers
+namespace SWP_Q_A_Tools_APIs.Controllers
 {
     [ApiController]
     [Route("api/student")]
@@ -17,7 +17,7 @@ namespace SWP_QA_Tools_APIs.Controllers
             _studentService = studentService;
         }
 
-        private string GetUserId()
+        private string? GetUserId()
         {
             return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
@@ -96,12 +96,12 @@ namespace SWP_QA_Tools_APIs.Controllers
 
     public class CreateQuestionRequestDto
     {
-        public string Title { get; set; }
-        public string Content { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
     }
     public class UpdateQuestionRequestDto
     {
-        public string Title { get; set; }
-        public string Content { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
     }
 }
