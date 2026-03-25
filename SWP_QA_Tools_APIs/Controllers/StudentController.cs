@@ -17,13 +17,13 @@ namespace SWP_QA_Tools_APIs.Controllers
             _studentService = studentService;
         }
 
-        private string GetUserId()
+        private string? GetUserId()
         {
             return User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         [HttpGet("questions")]
-        public async Task<IActionResult> GetMyQuestions([FromQuery] string status, [FromQuery] string keyword, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetMyQuestions([FromQuery] string? status = null, [FromQuery] string? keyword = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (!Guid.TryParse(GetUserId(), out var userGuid))
                 return Unauthorized();
@@ -37,6 +37,8 @@ namespace SWP_QA_Tools_APIs.Controllers
             if (!Guid.TryParse(GetUserId(), out var userGuid))
                 return Unauthorized();
             var result = await _studentService.GetQuestionDetail(id, userGuid);
+            if (result == null)
+                return NotFound(new { message = "Question not found." });
             return Ok(result);
         }
 
@@ -50,6 +52,8 @@ namespace SWP_QA_Tools_APIs.Controllers
             if (!Guid.TryParse(GetUserId(), out var userGuid))
                 return Unauthorized();
             var questionId = await _studentService.CreateQuestion(userGuid, dto.Title, dto.Content);
+            if (questionId == Guid.Empty)
+                return BadRequest("Student is not assigned to any group.");
             return Ok(new { questionId });
         }
 

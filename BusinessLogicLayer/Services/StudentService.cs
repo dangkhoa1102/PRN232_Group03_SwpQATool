@@ -41,16 +41,16 @@ namespace BusinessLogicLayer.Services
             _groupMemberRepository = groupMemberRepository;
         }
 
-        public async Task<QuestionListDto?> GetMyQuestions(Guid userId, string? status = null, string? keyword = null, int page = 1, int pageSize = 10)
+        public async Task<IEnumerable<QuestionListDto>> GetMyQuestions(Guid userId, string? status = null, string? keyword = null, int page = 1, int pageSize = 10)
         {
             var groupMember = await _groupMemberRepository.GetByStudentIdAsync(userId);
-            if (groupMember == null) return null;
+            if (groupMember == null) return Enumerable.Empty<QuestionListDto>();
             var groupId = groupMember.GroupId;
             var query = _questionRepository.Query()
                 .Where(q => q.GroupId == groupId);
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrWhiteSpace(status))
                 query = query.Where(q => q.Status == status);
-            if (!string.IsNullOrEmpty(keyword))
+            if (!string.IsNullOrWhiteSpace(keyword))
                 query = query.Where(q => q.Title.Contains(keyword));
             var questions = await query
                 .OrderByDescending(q => q.CreatedAt)
@@ -60,9 +60,7 @@ namespace BusinessLogicLayer.Services
                 .Include(q => q.Group)
                 .Include(q => q.Topic)
                 .ToListAsync();
-            var q = questions.FirstOrDefault();
-            if (q == null) return null;
-            return new QuestionListDto
+            return questions.Select(q => new QuestionListDto
             {
                 QuestionId = q.QuestionId,
                 Title = q.Title,
@@ -71,7 +69,7 @@ namespace BusinessLogicLayer.Services
                 TopicName = q.Topic?.TopicName ?? string.Empty,
                 CreatedByName = q.CreatedByNavigation?.FullName ?? string.Empty,
                 CreatedAt = q.CreatedAt
-            };
+            });
         }
 
         public async Task<QuestionDetailDto?> GetQuestionDetail(Guid questionId, Guid userId)
@@ -81,7 +79,9 @@ namespace BusinessLogicLayer.Services
             var question = await _questionRepository.Query()
                 .Where(q => q.QuestionId == questionId && q.GroupId == groupMember.GroupId)
                 .Include(q => q.Answer)
+                .ThenInclude(a => a.Reviewer)
                 .Include(q => q.CreatedByNavigation)
+                .Include(q => q.ApprovedByNavigation)
                 .Include(q => q.Group)
                 .Include(q => q.Topic)
                 .FirstOrDefaultAsync();
@@ -106,7 +106,11 @@ namespace BusinessLogicLayer.Services
                 UpdatedAt = question.UpdatedAt,
                 Answer = question.Answer != null ? new AnswerInfoDto
                 {
-                    // Map các trường cần thiết từ Answer
+                    AnswerId = question.Answer.AnswerId,
+                    AnswerContent = question.Answer.AnswerContent,
+                    ReviewerId = question.Answer.ReviewerId,
+                    ReviewerName = question.Answer.Reviewer?.FullName ?? string.Empty,
+                    AnsweredAt = question.Answer.AnsweredAt
                 } : null
             };
         }

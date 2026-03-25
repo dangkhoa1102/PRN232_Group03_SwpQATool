@@ -1,0 +1,15 @@
+services:
+  swp-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: swp-qa-api
+    ports:
+      - "5192:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__MyDbConnection: "Server=host.docker.internal;Database=swp_qa_tools;User Id=sa;Password=12345;TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=False"
+      Jwt__Issuer: "SWP_QA_Tools"
+      Jwt__Audience: "SWP_QA_Tools_Client"
+      Jwt__Key: "A_STRONG_SECRET_KEY_CHANGE_THIS_TO_32PLUS_CHARS_FOR_PRODUCTION"
+      Jwt__ExpiresMinutes: "480"
