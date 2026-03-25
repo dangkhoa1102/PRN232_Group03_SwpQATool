@@ -1,6 +1,0 @@
-@SWP_Q_A_Tools_APIs_HostAddress = http://localhost:5192
-
-GET {{SWP_Q_A_Tools_APIs_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
