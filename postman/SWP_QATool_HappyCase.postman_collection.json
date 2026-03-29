@@ -1,0 +1,1257 @@
+{
+  "info": {
+    "_postman_id": "7d61b98d-f69b-4eac-9381-fef0adfa9f79",
+    "name": "SWP QA Tool - Happy Case",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Happy-case test suite với JSON Schema validation cho tất cả responses. Dùng dữ liệu thật từ SQL Server qua API, không fake data đọc. Một số API Create/Update sẽ tạo dữ liệu mới để phục vụ luồng test end-to-end."
+  },
+  "item": [
+    {
+      "name": "00 - Auth Setup",
+      "item": [
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Has accessToken', () => { pm.expect(res.accessToken).to.exist; });",
+                  "pm.test('Response schema - Login', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['accessToken', 'expiresAtUtc', 'user'],",
+                  "    properties: {",
+                  "      accessToken: { type: 'string' },",
+                  "      expiresAtUtc: { type: 'string' },",
+                  "      user: { type: 'object' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('admin_token', res.accessToken);",
+                  "const userId = res.user?.userId || res.user?.user_id || res.user?.id;",
+                  "pm.environment.set('admin_user_id', userId || '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Supervisor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{supervisor_email}}\",\n  \"password\": \"{{supervisor_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Login', () => {",
+                  "  const schema = { type: 'object', required: ['accessToken', 'expiresAtUtc', 'user'], properties: { accessToken: { type: 'string' }, expiresAtUtc: { type: 'string' }, user: { type: 'object' } } };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('supervisor_token', res.accessToken);",
+                  "pm.environment.set('supervisor_user_id', (res.user && (res.user.userId || res.user.id)) || '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Reviewer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{reviewer_email}}\",\n  \"password\": \"{{reviewer_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Login', () => {",
+                  "  const schema = { type: 'object', required: ['accessToken', 'expiresAtUtc', 'user'], properties: { accessToken: { type: 'string' }, expiresAtUtc: { type: 'string' }, user: { type: 'object' } } };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('reviewer_token', res.accessToken);",
+                  "pm.environment.set('reviewer_user_id', (res.user && (res.user.userId || res.user.id)) || '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{student_email}}\",\n  \"password\": \"{{student_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Login', () => {",
+                  "  const schema = { type: 'object', required: ['accessToken', 'expiresAtUtc', 'user'], properties: { accessToken: { type: 'string' }, expiresAtUtc: { type: 'string' }, user: { type: 'object' } } };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('student_token', res.accessToken);",
+                  "pm.environment.set('student_user_id', (res.user && (res.user.userId || res.user.id)) || '');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Auth Me (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": "{{baseUrl}}/api/auth/me"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - User', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['userId', 'email'],",
+                  "    properties: {",
+                  "      userId: { type: 'string' },",
+                  "      email: { type: 'string' },",
+                  "      userCode: { type: 'string' },",
+                  "      fullName: { type: 'string' },",
+                  "      role: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Users (Admin)",
+      "item": [
+        {
+          "name": "Get Users - All",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Response is array', () => { pm.expect(Array.isArray(arr)).to.be.true; });",
+                  "if (arr.length > 0) {",
+                  "  pm.test('Response schema - User List Item', () => {",
+                  "    const schema = {",
+                  "      type: 'object',",
+                  "      required: ['userId', 'email', 'role'],",
+                  "      properties: {",
+                  "        userId: { type: 'string' },",
+                  "        userCode: { type: 'string' },",
+                  "        fullName: { type: 'string' },",
+                  "        email: { type: 'string' },",
+                  "        role: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true;",
+                  "  });",
+                  "  const u = arr[0];",
+                  "  pm.environment.set('existing_user_id', u.userId || u.id || u.user_id || '');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Users - By Role Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users?role=Student"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.expect(Array.isArray(arr)).to.be.true;",
+                  "if (arr.length > 0) {",
+                  "  pm.test('Response schema - User List Item', () => {",
+                  "    const schema = {",
+                  "      type: 'object',",
+                  "      required: ['userId', 'email', 'role'],",
+                  "      properties: {",
+                  "        userId: { type: 'string' },",
+                  "        userCode: { type: 'string' },",
+                  "        fullName: { type: 'string' },",
+                  "        email: { type: 'string' },",
+                  "        role: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true;",
+                  "  });",
+                  "  const s = arr[0];",
+                  "  const studentId = s.userId || s.id || s.user_id;",
+                  "  pm.environment.set('existing_student_id', studentId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Users - Unassigned",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users?role=Student&unassigned=true"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Response is array', () => { pm.expect(Array.isArray(arr)).to.be.true; });",
+                  "if (arr.length > 0) {",
+                  "  pm.test('Response schema - User List Item', () => {",
+                  "    const schema = {",
+                  "      type: 'object',",
+                  "      required: ['userId', 'email', 'role'],",
+                  "      properties: {",
+                  "        userId: { type: 'string' },",
+                  "        userCode: { type: 'string' },",
+                  "        fullName: { type: 'string' },",
+                  "        email: { type: 'string' },",
+                  "        role: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true;",
+                  "  });",
+                  "  const u = arr[0];",
+                  "  pm.environment.set('unassigned_student_id', u.userId || u.id || u.user_id || '');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users/{{existing_user_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - User Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['userId', 'email'],",
+                  "    properties: {",
+                  "      userId: { type: 'string' },",
+                  "      userCode: { type: 'string' },",
+                  "      fullName: { type: 'string' },",
+                  "      email: { type: 'string' },",
+                  "      role: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = Date.now();",
+                  "pm.environment.set('new_user_code', 'U' + t);",
+                  "pm.environment.set('new_user_email', `user${t}@mail.com`);",
+                  "pm.environment.set('new_user_name', `Happy User ${t}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - User Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['userId', 'email'],",
+                  "    properties: {",
+                  "      userId: { type: 'string' },",
+                  "      userCode: { type: 'string' },",
+                  "      fullName: { type: 'string' },",
+                  "      email: { type: 'string' },",
+                  "      role: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('created_user_id', res.userId || res.id || res.user_id || '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userCode\": \"{{new_user_code}}\",\n  \"fullName\": \"{{new_user_name}}\",\n  \"email\": \"{{new_user_email}}\",\n  \"password\": \"12345678\",\n  \"role\": \"Student\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/users/{{created_user_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{new_user_name}} Updated\",\n  \"password\": \"123456789\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - User Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['userId', 'email'],",
+                  "    properties: {",
+                  "      userId: { type: 'string' },",
+                  "      userCode: { type: 'string' },",
+                  "      fullName: { type: 'string' },",
+                  "      email: { type: 'string' },",
+                  "      role: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": "{{baseUrl}}/api/users/{{created_user_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "type": "text/javascript", "exec": ["pm.test('Status 204', function () { pm.response.to.have.status(204); });","pm.test('Response schema - Empty body', () => { const schema = { type: 'object', required: ['raw'], properties: { raw: { type: 'string', maxLength: 0 } } }; pm.expect(tv4.validateMultiple({ raw: pm.response.text() }, schema).valid).to.be.true; });"] }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Topics (Admin)",
+      "item": [
+        {
+          "name": "Get Topics - All",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/topics"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Response is array', () => { pm.expect(Array.isArray(arr)).to.be.true; });",
+                  "if (arr.length > 0) {",
+                  "  pm.test('Response schema - Topic List Item', () => {",
+                  "    const schema = {",
+                  "      type: 'object',",
+                  "      required: ['topicId', 'topicName'],",
+                  "      properties: {",
+                  "        topicId: { type: 'string' },",
+                  "        topicName: { type: 'string' },",
+                  "        description: { type: 'string' },",
+                  "        reviewerId: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true;",
+                  "  });",
+                  "  pm.environment.set('existing_topic_id', arr[0].topicId || arr[0].id || '');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Topic By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/topics/{{existing_topic_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Topic Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['topicId', 'topicName'],",
+                  "    properties: {",
+                  "      topicId: { type: 'string' },",
+                  "      topicName: { type: 'string' },",
+                  "      description: { type: 'string' },",
+                  "      reviewerId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Topic",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = Date.now();",
+                  "pm.environment.set('new_topic_name', 'Topic ' + t);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Topic Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['topicId', 'topicName'],",
+                  "    properties: {",
+                  "      topicId: { type: 'string' },",
+                  "      topicName: { type: 'string' },",
+                  "      description: { type: 'string' },",
+                  "      reviewerId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('created_topic_id', res.topicId || res.id || '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/topics",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topicName\": \"{{new_topic_name}}\",\n  \"description\": \"Happy case topic\",\n  \"reviewerId\": \"{{reviewer_user_id}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Topic",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/topics/{{created_topic_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topicName\": \"{{new_topic_name}} Updated\",\n  \"description\": \"Updated in happy case\",\n  \"reviewerId\": \"{{reviewer_user_id}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Topic Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['topicId', 'topicName'],",
+                  "    properties: {",
+                  "      topicId: { type: 'string' },",
+                  "      topicName: { type: 'string' },",
+                  "      description: { type: 'string' },",
+                  "      reviewerId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Topic",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/topics/{{created_topic_id}}"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 204', function () { pm.response.to.have.status(204); });","pm.test('Response schema - Empty body', () => { const schema = { type: 'object', required: ['raw'], properties: { raw: { type: 'string', maxLength: 0 } } }; pm.expect(tv4.validateMultiple({ raw: pm.response.text() }, schema).valid).to.be.true; });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "03 - Groups (Admin)",
+      "item": [
+        {
+          "name": "Get Groups - All",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/groups"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const arr = pm.response.json();",
+                  "pm.test('Response is array', () => { pm.expect(Array.isArray(arr)).to.be.true; });",
+                  "if (arr.length > 0) {",
+                  "  pm.test('Response schema - Group List Item', () => {",
+                  "    const schema = {",
+                  "      type: 'object',",
+                  "      required: ['groupId', 'groupName'],",
+                  "      properties: {",
+                  "        groupId: { type: 'string' },",
+                  "        groupName: { type: 'string' },",
+                  "        topicId: { type: 'string' },",
+                  "        supervisorId: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true;",
+                  "  });",
+                  "  pm.environment.set('existing_group_id', arr[0].groupId || arr[0].id || '');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Group By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/groups/{{existing_group_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Group Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['groupId', 'groupName'],",
+                  "    properties: {",
+                  "      groupId: { type: 'string' },",
+                  "      groupName: { type: 'string' },",
+                  "      topicId: { type: 'string' },",
+                  "      supervisorId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Group",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('new_group_name', 'Group ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Group Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['groupId', 'groupName'],",
+                  "    properties: {",
+                  "      groupId: { type: 'string' },",
+                  "      groupName: { type: 'string' },",
+                  "      topicId: { type: 'string' },",
+                  "      supervisorId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('created_group_id', res.groupId || res.id || '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/groups",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupName\": \"{{new_group_name}}\",\n  \"topicId\": \"{{existing_topic_id}}\",\n  \"supervisorId\": \"{{supervisor_user_id}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Group",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/groups/{{created_group_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"groupName\": \"{{new_group_name}} Updated\",\n  \"topicId\": \"{{existing_topic_id}}\",\n  \"supervisorId\": \"{{supervisor_user_id}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Group Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['groupId', 'groupName'],",
+                  "    properties: {",
+                  "      groupId: { type: 'string' },",
+                  "      groupName: { type: 'string' },",
+                  "      topicId: { type: 'string' },",
+                  "      supervisorId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Student For Group Member",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const t = Date.now();",
+                  "pm.environment.set('group_member_code', 'GM' + t);",
+                  "pm.environment.set('group_member_email', `groupmember${t}@swp.com`);",
+                  "pm.environment.set('group_member_name', `Group Member ${t}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - User Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['userId', 'email'],",
+                  "    properties: {",
+                  "      userId: { type: 'string' },",
+                  "      userCode: { type: 'string' },",
+                  "      fullName: { type: 'string' },",
+                  "      email: { type: 'string' },",
+                  "      role: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('member_student_id', res.userId || res.id || res.user_id || '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userCode\": \"{{group_member_code}}\",\n  \"fullName\": \"{{group_member_name}}\",\n  \"email\": \"{{group_member_email}}\",\n  \"password\": \"12345678\",\n  \"role\": \"Student\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Member To Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Add Member', () => { const schema = { type: 'object', required: ['message'], properties: { message: { type: 'string' } } }; pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/groups/{{created_group_id}}/members",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"{{member_student_id}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove Member From Group",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/groups/{{created_group_id}}/members/{{member_student_id}}"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 204', function () { pm.response.to.have.status(204); });","pm.test('Response schema - Empty body', () => { const schema = { type: 'object', required: ['raw'], properties: { raw: { type: 'string', maxLength: 0 } } }; pm.expect(tv4.validateMultiple({ raw: pm.response.text() }, schema).valid).to.be.true; });"] } }]
+        },
+        {
+          "name": "Delete Group",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }], "url": "{{baseUrl}}/api/groups/{{created_group_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 204', function () { pm.response.to.have.status(204); });","pm.test('Response schema - Empty body', () => { const schema = { type: 'object', required: ['raw'], properties: { raw: { type: 'string', maxLength: 0 } } }; pm.expect(tv4.validateMultiple({ raw: pm.response.text() }, schema).valid).to.be.true; });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "04 - Admin History",
+      "item": [
+        {
+          "name": "Get History - No Filter",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/admin/history"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - History', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['data', 'summary'],",
+                  "    properties: {",
+                  "      data: { type: 'array' },",
+                  "      summary: {",
+                  "        type: 'object',",
+                  "        properties: {",
+                  "          total: { type: 'number' },",
+                  "          answered: { type: 'number' },",
+                  "          approved: { type: 'number' },",
+                  "          rejected: { type: 'number' },",
+                  "          pending: { type: 'number' }",
+                  "        }",
+                  "      }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "if (res.data && Array.isArray(res.data) && res.data.length > 0) {",
+                  "  pm.test('Response schema - History Item', () => {",
+                  "    const itemSchema = {",
+                  "      type: 'object',",
+                  "      required: ['questionId', 'title', 'status'],",
+                  "      properties: {",
+                  "        questionId: { type: 'string' },",
+                  "        title: { type: 'string' },",
+                  "        status: { type: 'string' },",
+                  "        groupName: { type: 'string' },",
+                  "        topicName: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(res.data[0], itemSchema).valid).to.be.true;",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get History - Filter By Search",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{baseUrl}}/api/admin/history?search=question"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - History', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['data', 'summary'],",
+                  "    properties: {",
+                  "      data: { type: 'array' },",
+                  "      summary: {",
+                  "        type: 'object',",
+                  "        properties: {",
+                  "          total: { type: 'number' },",
+                  "          answered: { type: 'number' },",
+                  "          approved: { type: 'number' },",
+                  "          rejected: { type: 'number' },",
+                  "          pending: { type: 'number' }",
+                  "        }",
+                  "      }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Student",
+      "item": [
+        {
+          "name": "Student - Get My Questions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }],
+            "url": "{{baseUrl}}/api/student/questions?page=1&pageSize=10"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "const arr = Array.isArray(res) ? res : (res.items || []);",
+                  "pm.test('Response is array or has items property', () => { pm.expect(arr).to.be.an('array'); });",
+                  "if (arr.length > 0) {",
+                  "  pm.test('Response schema - Question Item', () => {",
+                  "    const schema = {",
+                  "      type: 'object',",
+                  "      required: ['questionId', 'title', 'status'],",
+                  "      properties: {",
+                  "        questionId: { type: 'string' },",
+                  "        title: { type: 'string' },",
+                  "        content: { type: 'string' },",
+                  "        status: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true;",
+                  "  });",
+                  "  pm.environment.set('student_existing_question_id', arr[0].questionId || arr[0].id || '');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student - Get Question Detail",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }],
+            "url": "{{baseUrl}}/api/student/questions/{{student_existing_question_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Question Detail', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['questionId', 'title', 'status'],",
+                  "    properties: {",
+                  "      questionId: { type: 'string' },",
+                  "      title: { type: 'string' },",
+                  "      content: { type: 'string' },",
+                  "      status: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student - Create Question (Q1 for Reject/Update)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('q1_title', 'Q1 ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Create Question', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['questionId'],",
+                  "    properties: {",
+                  "      questionId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('q1_id', res.questionId || res.id || '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{student_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/student/questions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{q1_title}}\",\n  \"content\": \"Happy case question content for reject/update flow\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Student - Create Question (Q2 for Approve/Answer)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('q2_title', 'Q2 ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const res = pm.response.json();",
+                  "pm.test('Response schema - Create Question', () => {",
+                  "  const schema = {",
+                  "    type: 'object',",
+                  "    required: ['questionId'],",
+                  "    properties: {",
+                  "      questionId: { type: 'string' }",
+                  "    }",
+                  "  };",
+                  "  pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true;",
+                  "});",
+                  "pm.environment.set('q2_id', res.questionId || res.id || '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{student_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/student/questions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{q2_title}}\",\n  \"content\": \"Happy case question content for approve/answer flow\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Student - Get Notifications",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }], "url": "{{baseUrl}}/api/student/notifications" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const arr = pm.response.json();","pm.test('Response schema - Notifications', () => { pm.expect(Array.isArray(arr)).to.be.true; if(arr.length > 0){ const schema = { type: 'object', required: ['notificationId'], properties: { notificationId: { type: 'string' }, message: { type: 'string' }, isRead: { type: 'boolean' } } }; pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true; } });","if(Array.isArray(arr) && arr.length>0){ pm.environment.set('student_notification_id', arr[0].notificationId || arr[0].id || ''); }"] } }]
+        },
+        {
+          "name": "Student - Mark Notification Read",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }], "url": "{{baseUrl}}/api/student/notifications/{{student_notification_id}}/read" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","pm.test('Response schema - Mark Read', () => { const text = pm.response.text(); if(text){ pm.expect(tv4.validateMultiple(pm.response.json(), { type: 'object' }).valid).to.be.true; } else { const schema = { type: 'object', required: ['raw'], properties: { raw: { type: 'string', maxLength: 0 } } }; pm.expect(tv4.validateMultiple({ raw: text }, schema).valid).to.be.true; } });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "06 - Supervisor",
+      "item": [
+        {
+          "name": "Supervisor - Get My Groups",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{supervisor_token}}" }], "url": "{{baseUrl}}/api/supervisor/questions/groups/me" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const arr = pm.response.json();","pm.test('Response schema - Supervisor Groups', () => { pm.expect(Array.isArray(arr)).to.be.true; if(arr.length > 0){ const schema = { type: 'object', required: ['groupId'], properties: { groupId: { type: 'string' }, groupName: { type: 'string' } } }; pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true; } });","if(Array.isArray(arr) && arr.length>0){ pm.environment.set('supervisor_group_id', arr[0].groupId || arr[0].id || ''); }"] } }]
+        },
+        {
+          "name": "Supervisor - Get Questions By Group",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{supervisor_token}}" }], "url": "{{baseUrl}}/api/supervisor/questions/groups/{{supervisor_group_id}}/questions" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const arr = pm.response.json();","pm.test('Response schema - Questions By Group', () => { pm.expect(Array.isArray(arr)).to.be.true; if(arr.length > 0){ const schema = { type: 'object', required: ['questionId', 'title', 'status'], properties: { questionId: { type: 'string' }, title: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true; } });"] } }]
+        },
+        {
+          "name": "Supervisor - Get My Questions",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{supervisor_token}}" }], "url": "{{baseUrl}}/api/supervisor/questions" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const arr = pm.response.json();","pm.test('Response schema - My Questions', () => { pm.expect(Array.isArray(arr)).to.be.true; if(arr.length > 0){ const schema = { type: 'object', required: ['questionId', 'title', 'status'], properties: { questionId: { type: 'string' }, title: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true; } });"] } }]
+        },
+        {
+          "name": "Supervisor - Reject Q1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisor_token}}" },{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/supervisor/questions/{{q1_id}}/reject",
+            "body": { "mode": "raw", "raw": "{\n  \"rejectReason\": \"Need more detail in question\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const res = pm.response.json();","pm.test('Response schema - Rejected Question', () => { const schema = { type: 'object', required: ['questionId', 'status'], properties: { questionId: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true; });"] } }]
+        },
+        {
+          "name": "Supervisor - Approve Q2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{supervisor_token}}" }],
+            "url": "{{baseUrl}}/api/supervisor/questions/{{q2_id}}/approve"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const res = pm.response.json();","pm.test('Response schema - Approved Question', () => { const schema = { type: 'object', required: ['questionId', 'status'], properties: { questionId: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true; });"] } }]
+        },
+        {
+          "name": "Supervisor - Get Question Detail Q2",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{supervisor_token}}" }], "url": "{{baseUrl}}/api/supervisor/questions/{{q2_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const res = pm.response.json();","pm.test('Response schema - Question Detail', () => { const schema = { type: 'object', required: ['questionId', 'title', 'status'], properties: { questionId: { type: 'string' }, title: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true; });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "07 - Student Update Rejected",
+      "item": [
+        {
+          "name": "Student - Update Rejected Q1",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" },{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/student/questions/{{q1_id}}",
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"{{q1_title}} Updated\",\n  \"content\": \"Updated after rejection - happy case\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","pm.test('Response schema - Update Rejected', () => { const text = pm.response.text(); if(text){ pm.expect(tv4.validateMultiple(pm.response.json(), { type: 'object' }).valid).to.be.true; } else { const schema = { type: 'object', required: ['raw'], properties: { raw: { type: 'string', maxLength: 0 } } }; pm.expect(tv4.validateMultiple({ raw: text }, schema).valid).to.be.true; } });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "08 - Reviewer",
+      "item": [
+        {
+          "name": "Reviewer - Get My Questions",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{reviewer_token}}" }], "url": "{{baseUrl}}/api/reviewer/questions" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const arr = pm.response.json();","pm.test('Response schema - Reviewer Questions', () => { pm.expect(Array.isArray(arr)).to.be.true; if(arr.length > 0){ const schema = { type: 'object', required: ['questionId', 'title', 'status'], properties: { questionId: { type: 'string' }, title: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(arr[0], schema).valid).to.be.true; } });"] } }]
+        },
+        {
+          "name": "Reviewer - Get Question Detail Q2",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{reviewer_token}}" }], "url": "{{baseUrl}}/api/reviewer/questions/{{q2_id}}" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const res = pm.response.json();","pm.test('Response schema - Reviewer Question Detail', () => { const schema = { type: 'object', required: ['questionId', 'title', 'status'], properties: { questionId: { type: 'string' }, title: { type: 'string' }, status: { type: 'string' } } }; pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true; });"] } }]
+        },
+        {
+          "name": "Reviewer - Answer Q2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{reviewer_token}}" },{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/reviewer/questions/{{q2_id}}/answer",
+            "body": { "mode": "raw", "raw": "{\n  \"answerContent\": \"This is the reviewer answer for happy-case test.\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });","const res = pm.response.json();","pm.test('Response schema - Answered Question', () => { const schema = { type: 'object', required: ['questionId', 'status'], properties: { questionId: { type: 'string' }, status: { type: 'string' }, answer: { type: 'object' }, answers: { type: 'array' } } }; pm.expect(tv4.validateMultiple(res, schema).valid).to.be.true; });"] } }]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5192" }
+  ]
+}
